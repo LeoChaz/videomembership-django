@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+
+{% block content %}
+
+    <div class="col-sm-6 col-sm-offset-3" style="text-align: center">
+        <h1>Register a free account</h1>
+        <form method="POST" action="{% url 'register' %}">{% csrf_token %}  <!-- csrf_token is required with django on
+        POST for
+        security -->
+            {{ form|crispy }}
+            <input class="btn btn-default" type="submit" value="Create free account">
+        </form>
+    </div>
+{% endblock %}

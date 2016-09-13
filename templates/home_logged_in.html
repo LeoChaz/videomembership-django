@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block head_title %}
+        SRVUP Homepage
+    {% endblock %}</title>
+
+ <style>
+    {% block style %}
+
+    {% endblock %}
+ </style>
+
+
+</head>
+<body>
+
+
+
+    {% block content %}
+<div class="col-sm-12" style="text-align: center">
+    {% if not recent_videos and not popular_videos and not recent_comments %}
+
+            <p>Welcome, watch out this video!</p>
+           <iframe width="560" height="315" src="https://www.youtube.com/embed/ZiTCRzzQDYU" frameborder="0" allowfullscreen></iframe>
+
+
+    {% endif %}
+        </div>
+
+    <div class="row">
+        <div class="col-sm-4">
+            <h1>Recent videos</h1>
+            {% if recent_videos %}
+                {% for vid in recent_videos %}
+
+                    <a href="{{ vid.get_absolute_url }}">{{ vid.title }}</a><br>
+                    {% if forloop.counter == 1 %}
+                        <a href="{{ vid.get_absolute_url }}"><img src="{{ vid.category.get_image_url }}" class="img-responsive"></a><br>
+                    {% endif %}
+                {% endfor %}
+            {% else %}
+                <p>Recently viewed videos will be here...</p>
+            {% endif %}
+            <hr>
+
+            <h1>Popular videos</h1>
+            {% if popular_videos %}
+                {% for vid in popular_videos %}
+
+                    <a href="{{ vid.get_absolute_url }}">{{ vid.title }}</a><br>
+                    {% if forloop.counter == 1 %}
+                        <a href="{{ vid.get_absolute_url }}"><img src="{{ vid.category.get_image_url }}" class="img-responsive"></a><br>
+                    {% endif %}
+                {% endfor %}
+            {% else %}
+                <p>Popular videos will be here...</p>
+            {% endif %}
+        </div>
+
+        <div class="col-sm-8">
+            <h1>Recent Comments</h1>
+            {% if recent_comments %}
+
+                    <table class="table">
+                        {% for comment in recent_comments %}
+                            <tr><td><a href="{{ comment.get_absolute_url }}">{{ comment.get_comment | truncatechars:100}}</a><br> <small>via {{ comment.user }} | {{ comment.timestamp|date:"d/m/Y" }}</small></td><td><a href="{{ comment.get_absolute_url }}">View</a></td></tr>
+                        {% endfor %}
+                    </table>
+            {% else %}
+                <p>Recent comments will be here...</p>
+            {% endif %}
+        </div>
+    </div>
+
+
+
+    {% endblock %}
+</body>
+</html>

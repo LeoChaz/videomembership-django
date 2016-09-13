@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <div class="row">
+        <div class="col-sm-10">
+            <h1>Billing History</h1>
+                {% if  request.user.is_member %}
+                  <p>Your subscription is active until <b>{{  request.user.membership.date_end }}</b></p>
+                {% endif %}
+        </div>
+        <div class="col-sm-2">
+            {% if not request.user.usermerchantid.subscription_id %}
+                <br>
+                <a class="btn btn-warning btn-block" href="{% url 'account_upgrade' %}">Upgrade Account</a>
+            {% else %}
+                <br>
+                <a class="btn btn-warning btn-block" href="{% url 'cancel_subscription' %}">Cancel Subscriptione</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <table class="table">
+            <thead>
+                <th>Order #</th>
+                <th>Date</th>
+                <th>Payment Method</th>
+                <th>Price</th>
+            </thead>
+            {% for object in queryset %}
+            <tr>
+                <td>{{ object.order_id }}</td>
+                <td>{{ object.timestamp }}</td>
+                <td>{{ object.card_type }}</td>
+                <td>${{ object.amount }}</td>
+            </tr>
+            {% endfor %}
+            </table>
+        </div>
+    </div>
+{% endblock %}

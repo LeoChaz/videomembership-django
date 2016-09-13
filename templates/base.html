@@ -1,0 +1,193 @@
+{% load staticfiles %}
+
+
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="../../favicon.ico">
+
+    <title>{% block head_title %}
+        SRVUP Project
+    {% endblock %}</title>
+
+    <!-- Bootstrap core CSS -->
+    <!-- <link href="../../dist/css/bootstrap.min.css" rel="stylesheet"> -->
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+
+
+
+
+    <!-- Custom styles for this template -->
+{#    <link href="navbar-static-top.css" rel="stylesheet">#}
+
+    <style>
+{#        body {#}
+{#          min-height: 1400px;#}
+{#        }#}
+
+        .footer {
+            background-color: #d6d6d6;
+            padding-top: 20px;
+            padding-bottom: 20px;
+            margin-top: 40px;
+            margin-bottom: 0px;
+            text-align: center;
+        }
+
+        .navbar-default {
+            background-color: #2a4c66;
+            border-color: #2a4c66 ;
+            background-image: url("http://www.transparenttextures.com/patterns/batthern.png");
+        }
+
+        .navbar-default .navbar-nav>li>a {
+            color: white;
+        }
+        .navbar-default .navbar-nav>li>a:hover {
+            color: rgba(234, 234, 234, 0.24);
+        }
+
+        .navbar-default .navbar-brand {
+            color: white;
+        }
+        .navbar-default .navbar-brand:hover {
+            color: rgba(234, 234, 234, 0.24);
+        }
+
+
+        .navbar-static-top {
+          margin-bottom: 0px;
+        }
+      {% block style %}{% endblock %}
+    </style>
+
+
+
+  </head>
+
+  <body>
+
+  {% include 'navbar.html' %}
+
+
+
+        {% block jumbotron %}
+        {% endblock %}
+
+    <div class="container">
+
+        <div id="notificationsLoader">
+
+        </div>
+
+        {% if messages %}
+
+        {% endif %}
+            {% for message in messages %}
+{#                {% if message.tags == 'success' %}#}
+{#                    <div class="alert alert-success" role="alert">{{ message }}</div>#}
+{#                {% elif message.tags == 'error' %}#}
+{#                    <div class="alert alert-danger" role="alert">{{ message }}</div>#}
+{#                {% endif %}#}
+{#                    ou#}
+{#                <div class="alert {% for tag in message.tags %}{{ tag }}{% endfor %}" role="alert">{{ message }}</div>#}
+{#                    ou#}
+                 <div class="alert {% if 'error' in message.tags %}alert-danger{% else %}alert-success{% endif %}" role="alert">{{ message }}</div>
+
+            {% endfor %}
+
+
+
+        {% block content %}
+        {% endblock %}
+
+      <!-- Main component for a primary marketing message or call to action
+      <div class="jumbotron">
+        <h1>Navbar example</h1>
+        <p>This example is a quick exercise to illustrate how the default, static and fixed to top navbar work. It includes the responsive CSS and HTML, so it also adapts to your viewport and device.</p>
+        <p>To see the difference between static and fixed top navbars, just scroll.</p>
+        <p>
+          <a class="btn btn-lg btn-primary" href="../../components/#navbar" role="button">View navbar docs &raquo;</a>
+        </p>
+      </div>-->
+
+    </div> <!-- /container -->
+
+  {% include 'footer.html' %}
+
+  {% include 'javascript.html' %}
+  <!-- JQUERY STUFFS DOIVENT ETRE FAIT EN DESSOUS CET INCLUDE -->
+
+  <script>
+      $(document).ready(function(){
+          //alert('jquery working');
+          {% block jquery %}{% endblock %}
+      })
+  </script>
+  <script>
+  $(document).ready(function(){
+      $(".notifications-toggle").click(function(e){
+          e.preventDefault();
+          $.ajax({
+              type: "POST",
+              url: "{% url 'get_notifications_ajax' %}",
+              data:  {
+                  csrfmiddlewaretoken: '{{ csrf_token }}'
+              },
+              success: function(data){
+                  $("#notifications_dropdown").html("<li class='dropdown-header'>Notifications</li>");
+                  var count = data.count;
+                  console.log(count);
+                  if (count == 0){
+                      var url = "{% url 'notifications_all' %}";
+                      $("#notifications_dropdown").append("<li><a href='" + url + "'>View all notifications</a></li>")
+                  }else {
+                      $(data.notifications).each(function () {
+                          var link = this;
+                          {#                  if ($(this).attr("href")==null){#}
+                          {#                      var url = "{% url 'notifications_all' %}"#}
+                          {#                      var new_link = "<a href='" + url + "'>" + link + "</a>"#}
+                          {#                      $("#notifications_dropdown").append("<li>" + new_link + "</li>")#}
+                          {#                  }else {#}
+                          {#                      $("#notifications_dropdown").append("<li>" + link + "</li>")#}
+                          {#                  }#}
+                          $("#notifications_dropdown").append("<li>" + link + "</li>")
+                      })
+                  }
+                  console.log(data.notifications);
+              },
+              error: function(rs, e) {
+                  console.log(rs);
+                  console.log(e);
+              }
+          })
+      })
+  })
+  </script>
+
+  </body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

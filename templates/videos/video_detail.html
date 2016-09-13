@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block head_title %}
+        SRVUP Video Detail
+    {% endblock %}</title>
+
+</head>
+
+<style>
+    {% block style %}
+        .reply_comment{
+            display: none;
+        }
+    {% endblock %}
+</style>
+
+<script>
+    {% block jquery %}
+        function update_iframe_size() {
+            var parent_id = $("iframe").parent().attr("id");
+            console.log(parent_id);
+            //if (parent_id == "main_video") {     // ne prendra effet que sur la div correspondante
+
+                var parent_class = $("iframe").parent().attr("class");
+                var parent_width = $("iframe").parent().width();
+                var width = $("iframe").css("width");  // pareil que $("iframe").width();
+                var height = $("iframe").css("height");
+                var ratio = parseInt(height) / parseInt(width);
+                var new_height = parseInt(parent_width) * ratio;
+                $("iframe").css("width", parent_width);
+                $("iframe").css("height", new_height);
+            //}
+        }
+        update_iframe_size();   // Au moment où on load la page
+        $(window).bind("resize", function(){
+            update_iframe_size();  // Lorsqu'on resize la page
+        });
+
+
+        $('.reply_btn').click(function(e){
+            e.preventDefault();
+            $(this).next(".reply_comment").fadeToggle();
+        });
+
+    {% endblock %}
+</script>
+
+<body>
+    {% block content %}
+
+        <div class="col-sm-12" id='main_video'>
+            <h1>{{ obj.title }}</h1>
+            <p>
+                {% if obj.get_previous_url %}
+                    <a href="{{ obj.get_previous_url }}"><i class="fa fa-arrow-circle-o-left"></i> Previous </a>
+                {% endif %}
+
+                |{% if obj.get_next_url %}
+                    <a href="{{ obj.get_next_url }}">Next <i class="fa fa-arrow-circle-o-right"></i></a>
+                {% endif %}
+            </p>
+            <hr>
+            <p>{{ obj.embed_code|safe }}</p>
+        </div>
+
+        {% if obj.tags.all %}
+            <div class="col-sm-12">
+                <h4>Tags/Content-type:</h4>
+                <ul>
+                {% for tag in obj.tags.all %}
+                    <li>{{ tag }}/{{ tag.content_type }}</li>
+                {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
+        <br>
+        <a target="_blank" href="https://twitter.com/home?status={{ obj.get_share_message|safe }}"><i class="fa fa-twitter-square fa-3x"></i></a>
+        <a target="_blank" href="https://www.facebook.com/sharer/sharer.php?u={{ obj.get_share_link }}"><i class="fa fa-facebook-square fa-3x"></i></a>
+
+
+        <div class="row">
+            <h2>Comments</h2>
+
+                <form method="POST" action='{% url "comment_create" %}'>{% csrf_token %}
+                <input type='hidden' name='video_id' value='{{ obj.id }}'/>
+                <input type='hidden' name='origin_path' value='{{ request.get_full_path }}'/>
+
+{#                {{ comment_form|crispy }}#}
+
+                {% crispy comment_form comment_form.helper %}
+
+
+{#                <input type="submit" class="btn btn-default" value="Add comment"/>#}
+            </form>
+            <br>
+            <table class="table">
+            {% for comment in comments %}
+                <tr><td>{{ comment.get_comment }}
+                    <br><small>by {{ comment.user }} | {{ comment.timestamp|date:"d/m/Y" }} | il y a {{ comment.timestamp|timesince }}</small>
+                    {% if not comment.is_child %}
+                        <ul>
+                            {% for child in comment.get_children %}
+                                <li>réponse: {{ child.get_comment }}<br><small>by {{ child }} | {{ comment.timestamp|date:"d/m/Y" }} | il y a {{ comment.timestamp|timesince }}</small></li>
+                            {% endfor %}
+                        </ul>
+
+
+                        <a href="{{ comment.get_absolute_url }}">View thread</a> | <a href="#" class="reply_btn">Reply</a>
+
+                        <div class="reply_comment">
+
+                            <form method="POST" action="{% url "comment_create" %}">{% csrf_token %}
+
+                            <input type='hidden' name='video_id' value='{% url "comment_create" %}'/>
+                            <input type='hidden' name='origin_path' value='{{ comment.get_origin }}'/>
+
+                            <input type='hidden' name='parent_id' value='{{ comment.id }}' />
+{#                            {% crispy comment_form comment_form.helper %}#}
+                            {{ comment_form|crispy }}
+                            <input type="submit" class="btn btn-default" value="Answer"/>
+                            </form>
+                        </div>
+                    {% endif %}
+                </td></tr>
+            {% endfor %}
+            </table>
+        </div>
+
+    {% endblock %}
+</body>
+
+
+
+</html>

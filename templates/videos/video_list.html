@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block head_title %}
+        SRVUP Video List
+    {% endblock %}</title>
+
+</head>
+<body>
+    {% block jumbotron %}
+        <div class="jumbotron">
+        <div class="container">
+        <div class="row">
+            <div class="col-sm-6">
+                <h1>{{ cat.title }}</h1>
+            </div>
+            <div class="col-sm-6">
+                <img src="{{ cat.get_image_url }}" class="img-responsive">
+            </div>
+        </div></div></div>
+    {% endblock %}
+    {% block content %}
+
+        <div class="col-sm-6 col-sm-offset-2">
+        {% if videos %}
+            <table class="table">
+                <thead>
+                    <th>#</th>
+                    <th>Title</th>
+                </thead>
+
+                {% for video in videos %}
+                        <tr><td>{{ forloop.counter }}</td><td>{% if request.user.is_authenticated or video.has_preview %}<a href="{{ video.get_absolute_url }}">{{ video }}</a>{% else %}{{ video }}{% endif %}</td></tr>
+                {% endfor %}
+            </table>
+        {% else %}
+            <h3 style="text-align: center">Videos are coming soon!</h3>
+        {% endif %}
+        </div>
+
+    {% endblock %}
+</body>
+</html>

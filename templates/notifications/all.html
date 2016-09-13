@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+    {% block content %}
+        <div class="col-sm-12" style="text-align: center">
+            <h1>Notifications</h1>
+        </div>
+        <div class="col-sm-10 col-sm-offset-1">
+            {% if notifications %}
+            <table class="table">
+                {% for note in notifications %}
+                    <tr>
+                        <td>
+                        {{ note|safe }}
+                        </td>
+                        <td>
+                            {% if note.read %}Read{% else %}Unread{% endif %}
+                        </td>
+                    </tr>
+
+                {% endfor %}
+            </table>
+            {% else %}
+                <p style="text-align: center ">This is where your notifications will appear when you'll have some!</p>
+            {% endif %}
+        </div>
+    {% endblock %}
+
+</body>
+</html>

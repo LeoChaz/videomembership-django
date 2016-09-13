@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block head_title %}
+
+    {% endblock %}</title>
+
+</head>
+<body>
+    {% block content %}
+
+        <a href="{{ comment.get_origin }}">Go Back</a>
+
+        <table class="table">
+
+             <tr><td>{{ comment.get_comment }}
+                    <br><small>by {{ comment.user }} | {{ comment.timestamp|date:"d/m/Y" }} | il y a {{ comment.timestamp|timesince }}</small>
+                    {% if not comment.is_child %}
+                        <ul>
+                            {% for child in comment.get_children %}
+                                <li>réponse: {{ child.get_comment }}<br><small>by {{ child }} | {{ comment.timestamp|date:"d/m/Y" }} | il y a {{ comment.timestamp|timesince }}</small></li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+
+
+                    <div>
+                        <form method="POST" action="{% url "comment_create" %}">{% csrf_token %}
+                            <input type="hidden" name="parent_id" value="{{ comment.id }}"/>
+                            {{ form|crispy }}
+{#                            {% crispy form form.helper %}#}
+                            <input type="submit" class="btn btn-default" value="Answer"/>
+                        </form>
+                    </div>
+             </td></tr>
+
+        </table>
+
+
+    {% endblock %}
+</body>
+</html>
+
+
+
+
